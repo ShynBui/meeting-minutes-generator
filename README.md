@@ -12,6 +12,7 @@ Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (
         * `preprocessing.py`: Module tiền xử lý transcript.
         * `summarizer.py`: Module gọi API OpenAI/Gemini để tạo meeting minutes.
         * `exporter.py`: Module xuất meeting minutes ra file Word.
+        * `schema.py`: Định dạng kiểu meeting minutes.
 * **`ui/`**: Chứa mã nguồn cho giao diện người dùng Gradio.
     * `interface.py`: Mã nguồn cho giao diện web đơn giản.
 * **`requirements.txt`**: Danh sách các thư viện Python cần thiết.
@@ -35,12 +36,12 @@ Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (
 
 ## Yêu cầu
 
-* Python 3.6+
+* Python 3.9+
 * Các thư viện được liệt kê trong `requirements.txt`
 
 ## Lưu ý
 
-* Cần có API key của OpenAI hoặc Gemini để sử dụng module `summarizer.py`.
+* Cần có API key của OpenAI hoặc Gemini để sử dụng module `summarizer.py` hoặc `exporter.py`.
 * Ứng dụng này chỉ hỗ trợ xuất meeting minutes ra file Word.
 * Giao diện Gradio chỉ là một giao diện web đơn giản để thử nghiệm.
 
