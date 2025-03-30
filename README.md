@@ -7,6 +7,7 @@ Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (
 
 * **`app/`**: Chứa mã nguồn cho API FastAPI.
     * `main.py`: Điểm đầu vào của API FastAPI.
+    * `config.py`:Cấu hình toàn cục (API keys, thông số model,...)
     * `modules/`: Chứa các module xử lý logic chính.
         * `preprocessing.py`: Module tiền xử lý transcript.
         * `summarizer.py`: Module gọi API OpenAI/Gemini để tạo meeting minutes.
