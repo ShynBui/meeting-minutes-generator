@@ -81,10 +81,11 @@ def save_transcript(segments: list, output_file: str) -> None:
     """
     with open(output_file, 'w', encoding='utf-8') as f:
         for seg in segments:
-            f.write(f"[{seg['start']:.2f}s -> {seg['end']:.2f}s] {seg['text']}\n")
+            # f.write(f"[{seg['start']:.2f}s -> {seg['end']:.2f}s] {seg['text']}\n")
+            f.write(f"{seg['text']}\n")
 
 
-
+##Error quote
 ##Hãy subscribe cho kênh Ghiền Mì Gõ Để không bỏ lỡ những video hấp dẫn
 ##Hãy đăng ký kênh để ủng hộ kênh của mình nhé!
 
