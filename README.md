@@ -26,13 +26,21 @@ Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (
     pip install -r requirements.txt
     ```
 
-2.  Chạy ứng dụng:
+2. Thiết lập API Key
 
+    Tạo file .env ở thư mục gốc với nội dung như sau:
+    ```text
+    OPENAI_API_KEY=your_openai_api_key_here
+    # hoặc nếu dùng Gemini:
+    GEMINI_API_KEY=your_gemini_api_key_here
+    ```
+
+3. Chạy ứng dụng:
     ```bash
     python ui/interface.py
     ```
 
-3.  Truy cập giao diện web tại `http://localhost:7860`.
+4. Truy cập giao diện web tại `http://localhost:7860`.
 
 ## Yêu cầu
 
