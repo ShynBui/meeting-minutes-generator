@@ -29,10 +29,10 @@ Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (
 2.  Chạy ứng dụng:
 
     ```bash
-    python run.py
+    python ui/interface.py
     ```
 
-3.  Truy cập giao diện web tại `http://localhost:8000`.
+3.  Truy cập giao diện web tại `http://localhost:7860`.
 
 ## Yêu cầu
 
