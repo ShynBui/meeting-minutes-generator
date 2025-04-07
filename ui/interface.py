@@ -53,7 +53,9 @@ def process_audio_to_docx(audio_file: str) -> str:
         output_docx = "generated_meeting_minutes.docx"
         export_meeting_minutes_to_docx(refined_minutes, output_docx)
 
-        return os.path.abspath(output_docx)
+        # return os.path.abspath(output_docx)
+        return output_docx
+
     except Exception as e:
         raise Exception(f"Xảy ra lỗi: {str(e)}")
     finally:
@@ -64,7 +66,7 @@ def process_audio_to_docx(audio_file: str) -> str:
 iface = gr.Interface(
     fn=process_audio_to_docx,
     inputs=gr.Audio(type="filepath", label="Tải lên file audio"),
-    outputs="textbox",
+    outputs=gr.File(label="Tải xuống biên bản họp (.docx)"),
     title="Meeting Minutes Generator",
     description="Tải lên file audio để tạo biên bản cuộc họp (DOCX). Kết quả sẽ trả về đường dẫn tới file .docx."
 )

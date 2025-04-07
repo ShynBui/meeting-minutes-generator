@@ -75,7 +75,7 @@ def export_meeting_minutes_to_docx(meeting_minutes: MeetingMinutes, output_file:
     # -------- TIÊU ĐỀ CHÍNH --------
     title_para = document.add_paragraph()
     title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run_title = title_para.add_run("BIÊN BẢN CUỘC HỌP GIAO BAN")
+    run_title = title_para.add_run("BIÊN BẢN CUỘC HỌP")
     run_title.font.name = 'Times New Roman'
     run_title.font.size = Pt(16)
     run_title.bold = True
