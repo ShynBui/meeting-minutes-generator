@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
 
+
 class MeetingMinutes(BaseModel):
     ngay_hop: Optional[str] = Field(
         None,
-        description="Ngày diễn ra cuộc họp. Định dạng: dd/mm/yyyy (ví dụ: 30/03/2025)"
+        description="Ngày diễn ra cuộc họp, định dạng: dd/mm/yyyy (ví dụ 30/03/2025)"
     )
     gio_hop: Optional[str] = Field(
         None,
@@ -12,19 +13,19 @@ class MeetingMinutes(BaseModel):
     )
     dia_diem: Optional[str] = Field(
         None,
-        description="Địa điểm tổ chức cuộc họp. Có thể là phòng họp, văn phòng, hoặc họp online (ví dụ: 'Phòng họp A')"
+        description="Địa điểm cuộc họp. Có thể là phòng họp, văn phòng, hoặc online. Ví dụ (Phòng họp A)"
     )
     chu_tri: Optional[str] = Field(
         None,
-        description="Tên người chủ trì cuộc họp (ví dụ: 'Nguyễn Văn A')"
+        description="Tên người chủ trì cuộc họp. Ví dụ (Bùi Tiến Phát)"
     )
     nguoi_ghi_chep: Optional[str] = Field(
         None,
-        description="Tên người ghi chép biên bản cuộc họp"
+        description="Tên người ghi chép cuộc họp"
     )
     thanh_vien_tham_du: Optional[List[str]] = Field(
         None,
-        description="Danh sách các thành viên tham dự cuộc họp"
+        description="Danh sách thành viên tham dự cuộc họp"
     )
     muc_tieu_cuoc_hop: Optional[str] = Field(
         None,
@@ -44,13 +45,14 @@ class MeetingMinutes(BaseModel):
     )
     ket_luan: Optional[str] = Field(
         None,
-        description="Tóm tắt kết luận của cuộc họp và hướng đi tiếp theo"
+        description="Tóm tắt kết luân của cuộc họp và hướng đi tiếp theo"
     )
     tai_lieu_dinh_kem: Optional[List[str]] = Field(
         None,
-        description="Danh sách các tài liệu liên quan được đính kèm hoặc đề cập trong cuộc họp"
+        description="Danh sách các tài liều liên quan được đính kèm hoặc đề cập trong cuộc họp"
     )
     ghi_chu: Optional[str] = Field(
         None,
-        description="Ghi chú bổ sung khác nếu có"
+        description="Ghi chú bổ sung nếu có"
     )
+

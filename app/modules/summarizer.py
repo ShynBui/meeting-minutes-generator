@@ -1,13 +1,15 @@
 from langchain_openai import ChatOpenAI
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
+from openai import api_key
+
 from app.modules.schema import MeetingMinutes
 from app.config import OPENAI_API_KEY
 import os
 from typing import List
 
 # Thiết lập API key cho OpenAI
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 
 def generate_meeting_minutes(transcript: str) -> MeetingMinutes:
@@ -185,14 +187,3 @@ def process_transcript_file(file_path: str, chunk_size: int = 7, chunk_overlap: 
         return merged_minutes
     else:
         raise ValueError("Không có dữ liệu transcript nào để xử lý.")
-
-
-# --- Phần test chạy độc lập ---
-# if __name__ == "__main__":
-#     transcript_file = r"D:\meeting-minutes-generator\app\transcript.txt"  # Đường dẫn tới file transcript
-#     try:
-#         merged_minutes = process_transcript_file(transcript_file, chunk_size=7, chunk_overlap=2)
-#         print("Merged Meeting Minutes:")
-#         print(merged_minutes.model_dump())
-#     except Exception as e:
-#         print(f"Error: {e}")

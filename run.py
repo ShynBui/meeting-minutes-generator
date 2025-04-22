@@ -1,109 +1,75 @@
-import argparse
+import gradio as gr
 import os
-import re
-from faster_whisper import WhisperModel
+from app.modules.preprocessing import transcribe_audio
+from app.modules.summarizer import process_transcript_file, generate_meeting_minutes
+from app.modules.exporter import export_meeting_minutes_to_docx, refine_meeting_minutes
+from app import config
 
-
-def clean_text(text: str) -> str:
+def process_audio_to_docx(audio_file: str, api_key_text: str) -> str:
     """
-    Hàm này thực hiện tiền xử lý văn bản:
-      - Loại bỏ khoảng trắng thừa.
-      - Cắt bỏ khoảng trắng đầu/cuối.
-    Có thể bổ sung thêm các bước xử lý khác nếu cần (ví dụ: chuẩn hóa dấu câu).
+    Nhận file audio và API key, chuyển đổi thành transcript, xử lý transcript để tạo MeetingMinutes,
+    refine MeetingMinutes và xuất ra file DOCX.
+
+    Args:
+        audio_file (str): Đường dẫn tới file audio được tải lên.
+        api_key_text (str): API Key dùng cho OpenAI.
+
+    Returns:
+        str: Đường dẫn file DOCX được tạo ra.
     """
-    # Loại bỏ khoảng trắng thừa giữa các từ
-    text = re.sub(r'\s+', ' ', text)
-    return text.strip()
+    if not audio_file:
+        raise ValueError("Không có file audio nào được tải lên.")
+    if not api_key_text:
+        raise ValueError("Vui lòng cung cấp OpenAI API Key.")
 
+    os.environ["OPENAI_API_KEY"] = api_key_text
 
-def preprocess_transcript(segments) -> list:
-    """
-    Duyệt qua các đoạn transcript từ model, tiền xử lý từng đoạn và trả về danh sách dictionary chứa:
-      - start: thời gian bắt đầu đoạn
-      - end: thời gian kết thúc đoạn
-      - text: nội dung đã được làm sạch
-    """
-    processed_segments = []
-    for segment in segments:
-        cleaned_text = clean_text(segment.text)
-        processed_segments.append({
-            'start': segment.start,
-            'end': segment.end,
-            'text': cleaned_text
-        })
-    return processed_segments
+    temp_transcript = "temp_transcript.txt"
+    try:
+        # Bước 1: Chuyển đổi audio thành transcript
+        segments, info = transcribe_audio(
+            input_audio=audio_file,
+            model_size=config.WHISPER_MODEL_SIZE,
+            device=config.WHISPER_DEVICE,
+            compute_type=config.WHISPER_COMPUTE_TYPE,
+            beam_size=config.WHISPER_BEAM_SIZE,
+            vad_filter=config.WHISPER_USE_VAD
+        )
 
+        # Bước 2: Kết hợp transcript thành văn bản
+        transcript_text = "\n".join(seg['text'] for seg in segments)
+        with open(temp_transcript, "w", encoding="utf-8") as f:
+            f.write(transcript_text)
 
-def save_transcript(segments: list, output_file: str):
-    """
-    Lưu transcript đã tiền xử lý vào file văn bản.
-    Mỗi đoạn được lưu kèm theo timestamp theo định dạng:
-      [start_time -> end_time] transcript_text
-    """
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for seg in segments:
-            f.write(f"[{seg['start']:.2f}s -> {seg['end']:.2f}s] {seg['text']}\n")
+        # Bước 3: Xử lý transcript thành MeetingMinutes
+        meeting_minutes = process_transcript_file(temp_transcript, chunk_size=10, chunk_overlap=2)
 
+        # Bước 4: Refine MeetingMinutes
+        refined_minutes = refine_meeting_minutes(meeting_minutes)
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Preprocessing và transcription audio bằng faster-whisper."
-    )
-    parser.add_argument("input_audio", help="Đường dẫn tới file audio (ví dụ: audio.mp3)")
-    parser.add_argument(
-        "-o", "--output", default="transcript.txt",
-        help="Đường dẫn file transcript đầu ra (mặc định: transcript.txt)"
-    )
-    parser.add_argument(
-        "--model_size", default="large-v3",
-        help="Kích thước model sử dụng (mặc định: large-v3)"
-    )
-    parser.add_argument(
-        "--device", default="cuda",
-        help="Thiết bị chạy inference (ví dụ: 'cuda' hoặc 'cpu')"
-    )
-    parser.add_argument(
-        "--compute_type", default="float16",
-        help="Kiểu tính toán (ví dụ: float16, int8, …)"
-    )
-    parser.add_argument(
-        "--beam_size", type=int, default=5,
-        help="Beam size cho quá trình transcribe (mặc định: 5)"
-    )
-    parser.add_argument(
-        "--vad_filter", action="store_true",
-        help="Bật VAD filter để loại bỏ phần không có lời nói"
-    )
-    args = parser.parse_args()
+        # Bước 5: Xuất ra DOCX
+        output_docx = "generated_meeting_minutes.docx"
+        export_meeting_minutes_to_docx(refined_minutes, output_docx)
 
-    # Kiểm tra file audio có tồn tại không
-    if not os.path.exists(args.input_audio):
-        print(f"Error: File '{args.input_audio}' không tồn tại.")
-        exit(1)
+        return output_docx
 
-    print("Đang load model...")
-    model = WhisperModel(args.model_size, device=args.device, compute_type=args.compute_type)
+    except Exception as e:
+        raise Exception(f"Xảy ra lỗi: {str(e)}")
+    finally:
+        if os.path.exists(temp_transcript):
+            os.remove(temp_transcript)
 
-    # Cấu hình tham số truyền cho hàm transcribe
-    transcription_kwargs = {"beam_size": args.beam_size}
-    if args.vad_filter:
-        transcription_kwargs["vad_filter"] = True
-
-    print(f"Đang chuyển đổi file {args.input_audio}...")
-    segments, info = model.transcribe(args.input_audio, **transcription_kwargs)
-
-    # Vì segments là generator nên ép nó thành list để dễ xử lý nhiều lần
-    segments = list(segments)
-
-    print(f"Ngôn ngữ phát hiện: {info.language} (xác suất: {info.language_probability:.2f})")
-
-    # Tiền xử lý transcript
-    processed_segments = preprocess_transcript(segments)
-
-    # Lưu transcript ra file
-    save_transcript(processed_segments, args.output)
-    print(f"Transcript đã được lưu tại {args.output}")
-
+# Giao diện Gradio cập nhật
+iface = gr.Interface(
+    fn=process_audio_to_docx,
+    inputs=[
+        gr.Audio(type="filepath", label="Tải lên file audio"),
+        gr.Textbox(lines=1, placeholder="Nhập OpenAI API Key", label="OpenAI API Key", type="text")
+    ],
+    outputs=gr.File(label="Tải xuống biên bản họp (.docx)"),
+    title="Meeting Minutes Generator",
+    description="Tải lên file audio và nhập OpenAI API Key để tạo biên bản cuộc họp (DOCX)."
+)
 
 if __name__ == "__main__":
-    main()
+    iface.launch()
