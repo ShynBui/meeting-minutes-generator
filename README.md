@@ -2,6 +2,10 @@
 
 Dự án này tạo ra một ứng dụng để tạo biên bản cuộc họp (meeting minutes) từ transcript.
 
+## Demo Video
+
+You can watch the demo on [YouTube](https://youtube.com/playlist?list=PLt11NO3k9FFyDDmVF_ssNgZ-zwiOt6eh8&si=agR2MCh06gB7PXui).
+
 ## Cấu trúc thư mục
 ### Mô tả
 
